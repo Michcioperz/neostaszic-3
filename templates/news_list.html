@@ -1,0 +1,33 @@
+{% extends "core.html" %}
+{% block head %}
+  {% if request.view_args["page"] > 1 %}
+    <link rel="prev" href="{{ url_for("news_page", page=(request.view_args["page"]-1)) }}"/>{% endif %}
+  <link rel="next" href="{{ url_for("news_page", page=request.view_args["page"]+1) }}"/>
+{% endblock head %}
+{% block body %}
+  {% for article in news %}
+    <div class="article" itemscope itemtype="https://schema.org/NewsArticle">
+      <meta itemprop="url" content="https://staszi.cf{{ url_for("news_item", item=article.id) }}"/>
+      {% if "img" in article and article.img != None %}
+        <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+          <img src="http://lo01.pl/staszic/{{ article.img }}"/>
+          <meta itemprop="url" content="http://lo01.pl/staszic/{{ article.img }}"/>
+        </div>
+      {% endif %}
+      <a href="{{ url_for("news_item", item=article.id) }}"><h2 itemprop="headline">{{ article.title }}</h2></a>
+      <h5>
+        <span itemprop="author" itemscope itemtype="https://schema.org/Person">dodane przez <span
+            itemprop="name">{{ article.author }}</span></span> <span class="code-breaker">&middot;</span>
+        <time itemprop="datePublished"
+              datetime="{{ article.time.isoformat() }}">{{ article.time.strftime("%d.%m.%Y %H:%M") }}</time>
+      </h5>
+
+      <span itemprop="description">
+        {{ article.content | safe }}
+      </span>
+    </div>
+  {% endfor %}
+  <div class="pagination">{% for i in range(max(1, request.view_args["page"]-5), request.view_args["page"]+6) %}
+    <div>{% if i != request.view_args["page"] %}<a href="{{ url_for("news_page", page=i) }}">{{ i }}</a>{% else %}
+      {{ i }}{% endif %}</div>{% endfor %}</div>
+{% endblock body %}

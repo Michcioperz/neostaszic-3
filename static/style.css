@@ -1,0 +1,77 @@
+body {
+  font-family: "Lato", "Roboto", sans-serif;
+  background-color: beige;
+  color: black;
+}
+
+div.pagination {
+  list-style-type: none;
+  text-align: center;
+}
+
+div.pagination div {
+  display: inline-block;
+  min-width: 20px;
+  min-height: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px grey;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+a:link, a:visited, a:hover {
+  color: blue;
+  transition: text-shadow 0.5s;
+  text-decoration: none;
+}
+
+header a:hover {
+  text-shadow: 1px 1px 1px blue;
+}
+
+.container {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 1081px) {
+  .container {
+    width: 80%;
+  }
+}
+
+.article img {
+  max-height: 10%;
+  max-width: 10%;
+  float: right;
+  transition: max-height 1s, max-width 1s;
+  margin: 10px;
+}
+
+.article img:hover {
+  max-height: 100%;
+  max-width: 50%;
+}
+
+header, .article {
+  margin-bottom: 40px;
+}
+
+.article {
+  background-color: white;
+  box-shadow: 0.25em 0.25em 0.25em grey;
+  transition: box-shadow 0.5s;
+  padding: 10px;
+  min-height: 130px;
+}
+
+.article:hover {
+  box-shadow: 1em 1em 1em grey;
+}
+
+.code-breaker {
+  margin-left: 5px;
+  margin-right: 5px;
+}
