@@ -36,7 +36,8 @@ def get_article(item: int) -> dict:
     return dict(img=image_if_any(x), title=x.find("div", "news_title").get_text(), id=item,
                 content=x.find("div", "news_content"),
                 author=x.find("div", "news_author").get_text().split("dodany przez: ", 1)[1],
-                time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y"))
+                time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y"),
+                cleantext=BeautifulSoup(x.find("div", "news_content").text))
 
 
 @app.route('/', defaults={"page": 1})
