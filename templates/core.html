@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" prefix="og: http://ogp.me/ns#">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1"/>
@@ -8,6 +8,8 @@
   <title>NeoStaszic-3</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext" type="text/css"/>
   <link rel="stylesheet" href="{{ url_for("static", filename="style.css") }}"/>
+  <meta property="og:site_name" content="NeoStaszic-3"/>
+  <meta property="og:locale" content="pl_PL"/>
   {% block head %}{% endblock head %}
 </head>
 <body>

@@ -75,3 +75,8 @@ header, .article {
   margin-left: 5px;
   margin-right: 5px;
 }
+
+.pagination .active {
+  background-color: blue;
+  color: white;
+}

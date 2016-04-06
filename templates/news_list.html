@@ -28,6 +28,6 @@
     </div>
   {% endfor %}
   <div class="pagination">{% for i in range(max(1, request.view_args["page"]-5), request.view_args["page"]+6) %}
-    <div>{% if i != request.view_args["page"] %}<a href="{{ url_for("news_page", page=i) }}">{{ i }}</a>{% else %}
-      {{ i }}{% endif %}</div>{% endfor %}</div>
+    <div {% if i != request.view_args["page"] %}><a href="{{ url_for("news_page", page=i) }}">{{ i }}</a>{% else %}
+      class="active">{{ i }}{% endif %}</div>{% endfor %}</div>
 {% endblock body %}
