@@ -60,7 +60,7 @@ def news_item(item: int) -> Response:
 @app.route("/feed.atom")
 def feed_atom() -> Response:
     feed = AtomFeed("NeoStaszic-3", feed_url=request.url, url=request.url_root)
-    for article in get_news():
+    for article in sorted(get_news(), key=itemgetter("time"), reverse=True):
         feed.add(article["title"], article["content"], content_type="html", author=article["author"],
                  url=url_for("news_item", item=article["id"]), published=article["time"], updated=article["time"])
     return feed.get_response()
