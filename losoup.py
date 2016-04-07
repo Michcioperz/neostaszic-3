@@ -1,4 +1,5 @@
 import datetime
+import time
 import urllib.parse
 from operator import itemgetter
 
@@ -9,6 +10,12 @@ from werkzeug.contrib.atom import AtomFeed
 
 app = Flask(__name__)
 
+page_ttl = 60
+article_ttl = 900
+
+articles_cache = {}
+page_cache = {}
+
 
 def image_if_any(x) -> str:
     try:
@@ -17,7 +24,7 @@ def image_if_any(x) -> str:
         return None
 
 
-def get_news(page: int = 1) -> list:
+def _get_news(page: int = 1) -> list:
     r = requests.get("http://lo01.pl/staszic/index.php", params=dict(page=page))
     r.encoding = "UTF-8"
     n = [dict(img=image_if_any(x), title=x.find("div", "news_title").get_text(),
@@ -33,18 +40,33 @@ def get_news(page: int = 1) -> list:
             print(i)
             n[i]["pinned"] = True
             i += 1
+    page_cache[page] = (n, time.time())
     return n
 
 
-def get_article(item: int) -> dict:
+def get_news(page: int = 1) -> dict:
+    if page in page_cache and time.time() - page_cache[page][1] <= page_ttl:
+        return page_cache[page][0]
+    return _get_news(page)
+
+
+def _get_article(item: int) -> dict:
     r = requests.get("http://lo01.pl/staszic/index.php", params=dict(subpage="news", id=item))
     r.encoding = "UTF-8"
     x = BeautifulSoup(r.text).find("div", "news")
-    return dict(img=image_if_any(x), title=str(x.find("div", "news_title").get_text()), id=item,
-                content=str(x.find("div", "news_content")),
-                author=str(x.find("div", "news_author").get_text()).split("dodany przez: ", 1)[1],
-                time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y"),
-                cleantext=str(BeautifulSoup(x.find("div", "news_content").get_text())).strip())
+    a = dict(img=image_if_any(x), title=str(x.find("div", "news_title").get_text()), id=item,
+             content=str(x.find("div", "news_content")),
+             author=str(x.find("div", "news_author").get_text()).split("dodany przez: ", 1)[1],
+             time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y"),
+             cleantext=str(BeautifulSoup(x.find("div", "news_content").get_text())).strip())
+    articles_cache[item] = (a, time.time())
+    return a
+
+
+def get_article(item: int) -> dict:
+    if item in articles_cache and time.time() - articles_cache[item][1] <= article_ttl:
+        return articles_cache[item][0]
+    return _get_article(item)
 
 
 @app.route('/', defaults={"page": 1})
