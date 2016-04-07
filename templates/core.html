@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1"/>
-  <link rel="canonical" href="https://staszi.cf{{ request.path }}"/>
   <link rel="alternate" type="application/atom+xml" title="Najnowsze informacje" href="{{ url_for("feed_atom") }}"/>
   <title>NeoStaszic-3</title>
+  <meta name="description"
+        content="Alternatywna i nieoficjalna strona I Liceum Ogólnokształcącego im. Stanisława Staszica w Lublinie"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext" type="text/css"/>
   <link rel="stylesheet" href="{{ url_for("static", filename="style.css") }}"/>
   <meta property="og:site_name" content="NeoStaszic-3"/>
@@ -15,7 +16,12 @@
 <body>
 <div class="container">
   <header>
+    <small>alternatywna i nieoficjalna strona I Liceum Ogólnokształcącego im. Stanisława Staszica w Lublinie</small>
     <h1><a href="/">NeoStaszic-3</a></h1>
+    <nav>
+      <div class="item"><a href="https://za.staszi.cf">Zastępstwa</a></div>
+      <div class="item"><a href="{{ url_for("feed_atom") }}">RSS</a></div>
+    </nav>
   </header>
   <main>
     {% block body %}{% endblock body %}

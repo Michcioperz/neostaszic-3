@@ -1,16 +1,19 @@
 {% extends "core.html" %}
 {% block head %}
+  <link rel="canonical" href="https://staszi.cf{{ url_for("news_page", page=request.view_args["page"]) }}"/>
   {% if request.view_args["page"] > 1 %}
     <link rel="prev" href="{{ url_for("news_page", page=(request.view_args["page"]-1)) }}"/>{% endif %}
+  {% if len(news) %}
   <link rel="next" href="{{ url_for("news_page", page=request.view_args["page"]+1) }}"/>
+  {% endif %}
 {% endblock head %}
 {% block body %}
   {% for article in news %}
-    <div class="article" itemscope itemtype="https://schema.org/NewsArticle">
+    <div class="article{% if article.pinned %} pinned{% endif %}" itemscope itemtype="https://schema.org/NewsArticle">
       <meta itemprop="url" content="https://staszi.cf{{ url_for("news_item", item=article.id) }}"/>
       {% if "img" in article and article.img != None %}
         <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
-          <img src="http://lo01.pl/staszic/{{ article.img }}"/>
+          <img generator-unable-to-provide-required-alt src="http://lo01.pl/staszic/{{ article.img }}"/>
           <meta itemprop="url" content="http://lo01.pl/staszic/{{ article.img }}"/>
         </div>
       {% endif %}
@@ -27,7 +30,8 @@
       </span>
     </div>
   {% endfor %}
-  <div class="pagination">{% for i in range(max(1, request.view_args["page"]-5), request.view_args["page"]+6) %}
+  <div class="pagination">
+    {% for i in range(max(1, request.view_args["page"]-2), request.view_args["page"]+(2+1 if len(news) >= 5 else 1)) %}
     <div {% if i != request.view_args["page"] %}><a href="{{ url_for("news_page", page=i) }}">{{ i }}</a>{% else %}
       class="active">{{ i }}{% endif %}</div>{% endfor %}</div>
 {% endblock body %}

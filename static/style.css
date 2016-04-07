@@ -20,9 +20,30 @@ div.pagination div {
   margin-right: 5px;
 }
 
+nav {
+  text-align: center;
+}
+
+nav div.item {
+  float: left;
+  display: inline-block;
+  background-color: white;
+  color: black;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px grey;
+  margin-right: 10px;
+  margin-bottom: 20px;
+  padding: 5px;
+}
+
+main {
+  clear: both;
+
+}
+
 a:link, a:visited, a:hover {
   color: blue;
-  transition: text-shadow 0.5s;
+  transition: all 0.5s;
   text-decoration: none;
 }
 
@@ -46,7 +67,7 @@ header a:hover {
   max-height: 10%;
   max-width: 10%;
   float: right;
-  transition: max-height 1s, max-width 1s;
+  transition: all 1s;
   margin: 10px;
 }
 
@@ -61,14 +82,15 @@ header, .article {
 
 .article {
   background-color: white;
-  box-shadow: 0.25em 0.25em 0.25em grey;
-  transition: box-shadow 0.5s;
+  box-shadow: 0.25em 0.25em 0.25em lightgrey;
+  transition: all 0.5s;
   padding: 10px;
   min-height: 130px;
 }
 
 .article:hover {
-  box-shadow: 1em 1em 1em grey;
+  box-shadow: 1em 1em 1em lightgrey;
+  /*transform: perspective(10em) translateZ(0.5em);*/
 }
 
 .code-breaker {
@@ -79,4 +101,18 @@ header, .article {
 .pagination .active {
   background-color: blue;
   color: white;
+}
+
+.article.pinned {
+  box-shadow: 0.4em 0.4em 0.4em lightsteelblue;
+}
+
+.article.pinned:hover {
+  box-shadow: 1em 1em 1em lightsteelblue;
+}
+
+header small {
+  float: right;
+  font-size: small;
+  font-variant: small-caps;
 }
