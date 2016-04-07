@@ -4,7 +4,7 @@ from operator import itemgetter
 
 import requests
 from bs4 import BeautifulSoup
-from flask import Flask, render_template, request, url_for, Response
+from flask import Flask, render_template, request, url_for, Response, jsonify
 from werkzeug.contrib.atom import AtomFeed
 
 app = Flask(__name__)
@@ -22,9 +22,10 @@ def get_news(page: int = 1) -> list:
     r.encoding = "UTF-8"
     n = [dict(img=image_if_any(x), title=x.find("div", "news_title").get_text(),
               id=urllib.parse.parse_qs(urllib.parse.urlparse(x.find("div", "news_title").a["href"]).query)["id"][0],
-              content=x.find("div", "news_content"),
+              content=str(x.find("div", "news_content")),
               author=x.find("div", "news_author").get_text().split("dodany przez: ", 1)[1],
-              time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y"), pinned=False)
+              time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y"),
+              cleantext=str(BeautifulSoup(x.find("div", "news_content").get_text())).strip(), pinned=False)
          for x in BeautifulSoup(r.text).find_all("div", "news")]
     if page == 1:
         i = 0
@@ -39,11 +40,11 @@ def get_article(item: int) -> dict:
     r = requests.get("http://lo01.pl/staszic/index.php", params=dict(subpage="news", id=item))
     r.encoding = "UTF-8"
     x = BeautifulSoup(r.text).find("div", "news")
-    return dict(img=image_if_any(x), title=x.find("div", "news_title").get_text(), id=item,
-                content=x.find("div", "news_content"),
-                author=x.find("div", "news_author").get_text().split("dodany przez: ", 1)[1],
+    return dict(img=image_if_any(x), title=str(x.find("div", "news_title").get_text()), id=item,
+                content=str(x.find("div", "news_content")),
+                author=str(x.find("div", "news_author").get_text()).split("dodany przez: ", 1)[1],
                 time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y"),
-                cleantext=BeautifulSoup(x.find("div", "news_content").get_text()))
+                cleantext=str(BeautifulSoup(x.find("div", "news_content").get_text())).strip())
 
 
 @app.route('/', defaults={"page": 1})
@@ -52,9 +53,19 @@ def news_page(page: int) -> Response:
     return render_template("news_list.html", news=get_news(page), max=max, len=len)
 
 
+@app.route('/p/<int:page>.json')
+def news_page_json(page: int) -> Response:
+    return jsonify(data=get_news(page))
+
+
 @app.route('/n/<int:item>')
 def news_item(item: int) -> Response:
     return render_template("news_item.html", article=get_article(item))
+
+
+@app.route('/n/<int:item>.json')
+def news_item_json(item: int) -> Response:
+    return jsonify(data=get_article(item))
 
 
 @app.route("/feed.atom")
