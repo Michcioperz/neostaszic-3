@@ -1,5 +1,5 @@
 body {
-  font-family: "Lato", "Roboto", sans-serif;
+  font-family: "Helvetica Neue", "Lato", "Roboto", sans-serif;
   background-color: beige;
   color: black;
 }
@@ -69,11 +69,14 @@ header a:hover {
   float: right;
   transition: all 1s;
   margin: 10px;
+  margin-left: 25px;
+  border: 3px solid #EEE;
 }
 
 .article img:hover {
   max-height: 100%;
   max-width: 50%;
+  border: 3px solid #888;
 }
 
 header, .article {
