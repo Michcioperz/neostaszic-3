@@ -7,14 +7,13 @@ import requests
 from bs4 import BeautifulSoup
 from flask import Flask, render_template, request, url_for, Response, jsonify
 from werkzeug.contrib.atom import AtomFeed
+from redis import Redis
 
 app = Flask(__name__)
+cache = Redis()
 
 page_ttl = 60
 article_ttl = 900
-
-articles_cache = {}
-page_cache = {}
 
 
 def image_if_any(x) -> str:
@@ -40,13 +39,17 @@ def _get_news(page: int = 1) -> list:
             print(i)
             n[i]["pinned"] = True
             i += 1
-    page_cache[page] = (n, time.time())
+    with cache.pipeline() as pipe:
+        pipe.set('p:%i' % page, pickle.dumps(n))
+        pipe.expire('p:%i' % page, page_ttl)
+        pipe.execute()
     return n
 
 
 def get_news(page: int = 1) -> dict:
-    if page in page_cache and time.time() - page_cache[page][1] <= page_ttl:
-        return page_cache[page][0]
+    loaded = r.get("p:%i" % page)
+    if loaded:
+        return pickle.loads(loaded)
     return _get_news(page)
 
 
@@ -59,13 +62,17 @@ def _get_article(item: int) -> dict:
              author=str(x.find("div", "news_author").get_text()).split("dodany przez: ", 1)[1],
              time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y"),
              cleantext=str(BeautifulSoup(x.find("div", "news_content").get_text())).strip())
-    articles_cache[item] = (a, time.time())
+    with cache.pipeline() as pipe:
+        pipe.set('n:%i' % page, pickle.dumps(a))
+        pipe.expire('n:%i' % page, article_ttl)
+        pipe.execute()
     return a
 
 
 def get_article(item: int) -> dict:
-    if item in articles_cache and time.time() - articles_cache[item][1] <= article_ttl:
-        return articles_cache[item][0]
+    loaded = r.get("n:%i" % item)
+    if loaded:
+        return pickle.loads(loaded)
     return _get_article(item)
 
 
