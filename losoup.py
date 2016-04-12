@@ -32,7 +32,7 @@ def _get_news(page: int = 1) -> list:
               content=str(x.find("div", "news_content")),
               author=x.find("div", "news_author").get_text().split("dodany przez: ", 1)[1],
               time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y"),
-              cleantext=str(BeautifulSoup(x.find("div", "news_content").get_text())).strip(), pinned=False)
+              cleantext=str(x.find("div", "news_content").get_text()).strip(), pinned=False)
          for x in BeautifulSoup(r.text).find_all("div", "news")]
     if page == 1:
         i = 0
@@ -62,7 +62,7 @@ def _get_article(item: int) -> dict:
              content=str(x.find("div", "news_content")),
              author=str(x.find("div", "news_author").get_text()).split("dodany przez: ", 1)[1],
              time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y"),
-             cleantext=str(BeautifulSoup(x.find("div", "news_content").get_text())).strip())
+             cleantext=str(x.find("div", "news_content").get_text()).strip())
     with cache.pipeline() as pipe:
         pipe.set('n:%i' % item, pickle.dumps(a))
         pipe.expire('n:%i' % item, article_ttl)
