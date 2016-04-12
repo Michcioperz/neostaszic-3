@@ -1,19 +1,20 @@
 import datetime
 import time
 import urllib.parse
+import pickle
 from operator import itemgetter
 
 import requests
 from bs4 import BeautifulSoup
-from flask import Flask, render_template, request, url_for, Response, jsonify
+from flask import Flask, render_template, request, url_for, Response, jsonify, abort
 from werkzeug.contrib.atom import AtomFeed
 from redis import Redis
 
 app = Flask(__name__)
 cache = Redis()
 
-page_ttl = 60
-article_ttl = 900
+page_ttl = 180
+article_ttl = 1800
 
 
 def image_if_any(x) -> str:
@@ -47,7 +48,7 @@ def _get_news(page: int = 1) -> list:
 
 
 def get_news(page: int = 1) -> dict:
-    loaded = r.get("p:%i" % page)
+    loaded = cache.get("p:%i" % page)
     if loaded:
         return pickle.loads(loaded)
     return _get_news(page)
@@ -63,14 +64,14 @@ def _get_article(item: int) -> dict:
              time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y"),
              cleantext=str(BeautifulSoup(x.find("div", "news_content").get_text())).strip())
     with cache.pipeline() as pipe:
-        pipe.set('n:%i' % page, pickle.dumps(a))
-        pipe.expire('n:%i' % page, article_ttl)
+        pipe.set('n:%i' % item, pickle.dumps(a))
+        pipe.expire('n:%i' % item, article_ttl)
         pipe.execute()
     return a
 
 
 def get_article(item: int) -> dict:
-    loaded = r.get("n:%i" % item)
+    loaded = cache.get("n:%i" % item)
     if loaded:
         return pickle.loads(loaded)
     return _get_article(item)
@@ -89,11 +90,13 @@ def news_page_json(page: int) -> Response:
 
 @app.route('/n/<int:item>')
 def news_item(item: int) -> Response:
+    if item < 73: abort(404)
     return render_template("news_item.html", article=get_article(item))
 
 
 @app.route('/n/<int:item>.json')
 def news_item_json(item: int) -> Response:
+    if item < 73: abort(404)
     return jsonify(data=get_article(item))
 
 
