@@ -17,7 +17,7 @@ page_ttl = 180
 article_ttl = 1800
 
 
-def image_if_any(x) -> str:
+def image_if_any(x: BeautifulSoup) -> str:
     try:
         return x.find("a", "highslide").extract()["href"]
     except AttributeError:
@@ -56,6 +56,10 @@ def get_news(page: int = 1) -> dict:
     return _get_news(page)
 
 
+def get_fresh_news() -> dict:
+    return sorted(get_news(1)+get_news(2), key=itemgetter("time"), reverse=True)
+
+
 def _get_article(item: int) -> dict:
     r = requests.get("http://lo01.pl/staszic/index.php", params=dict(subpage="news", id=item))
     r.encoding = "UTF-8"
@@ -89,6 +93,16 @@ def news_page(page: int) -> Response:
 @app.route('/p/<int:page>.json')
 def news_page_json(page: int) -> Response:
     return jsonify(data=get_news(page))
+
+
+@app.route('/p/f')
+def news_page_fresh() -> Response:
+    return render_template("news_list.html", news=get_fresh_news(), max=max, len=len)
+
+
+@app.route('/p/f.json')
+def news_page_fresh_json() -> Response:
+    return jsonify(data=get_fresh_news())
 
 
 @app.route('/n/<int:item>')
