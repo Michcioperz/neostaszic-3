@@ -96,8 +96,8 @@ def news_page_json(page: int) -> Response:
 
 
 @app.route('/p/f')
-def news_page_fresh() -> Response:
-    return render_template("news_list.html", news=get_fresh_news(), max=max, len=len, page=1)
+def news_page_fresh(page: int = 1) -> Response:
+    return render_template("news_list.html", news=get_fresh_news(), max=max, len=len)
 
 
 @app.route('/p/f.json')
