@@ -31,7 +31,7 @@ def _get_news(page: int = 1) -> list:
               id=urllib.parse.parse_qs(urllib.parse.urlparse(x.find("div", "news_title").a["href"]).query)["id"][0],
               content=str(x.find("div", "news_content")),
               author=x.find("div", "news_author").get_text().split("dodany przez: ", 1)[1],
-              time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y"),
+              time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y").isoformat(),
               cleantext=str(x.find("div", "news_content").get_text()).strip(), pinned=False)
          for x in BeautifulSoup(r.text).find_all("div", "news")]
     if page == 1:
@@ -67,7 +67,7 @@ def _get_article(item: int) -> dict:
     a = dict(img=image_if_any(x), title=str(x.find("div", "news_title").get_text()), id=item,
              content=str(x.find("div", "news_content")),
              author=str(x.find("div", "news_author").get_text()).split("dodany przez: ", 1)[1],
-             time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y"),
+             time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y").isoformat(),
              cleantext=str(x.find("div", "news_content").get_text()).strip())
     a["content"] = bleach.clean(a["content"], strip=True, tags=["p", "strong", "em", "ul", "ol", "li", "img"])
     with cache.pipeline() as pipe:
