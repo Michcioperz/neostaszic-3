@@ -22,7 +22,7 @@
         <span itemprop="author" itemscope itemtype="https://schema.org/Person">dodane przez <span
             itemprop="name">{{ article.author }}</span></span> <span class="code-breaker">&middot;</span>
         <time itemprop="datePublished"
-              datetime="{{ article.time.isoformat() }}">{{ article.time.strftime("%d.%m.%Y %H:%M") }}</time>
+              datetime="{{ article.time }}">{{ article.time }}</time>
       </h5>
 
       <span itemprop="description">
