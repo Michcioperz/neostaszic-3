@@ -13,6 +13,9 @@ from werkzeug.contrib.atom import AtomFeed
 app = Flask(__name__)
 cache = Redis()
 
+ALLOWED_ATTRIBUTES = bleach.ALLOWED_ATTRIBUTES
+ALLOWED_ATTRIBUTES["img"] = ["src", "alt"]
+
 page_ttl = 180
 article_ttl = 1800
 
@@ -41,7 +44,7 @@ def _get_news(page: int = 1) -> list:
             n[i]["pinned"] = True
             i += 1
     for news in n:
-        news["content"] = bleach.clean(news["content"], strip=True, tags=["p", "strong", "em", "ul", "ol", "li", "img"])
+        news["content"] = bleach.clean(news["content"], strip=True, tags=["p", "strong", "em", "ul", "ol", "li", "img"], attributes=ALLOWED_ATTRIBUTES)
     with cache.pipeline() as pipe:
         pipe.set('p:%i' % page, pickle.dumps(n))
         pipe.expire('p:%i' % page, page_ttl)
@@ -69,7 +72,7 @@ def _get_article(item: int) -> dict:
              author=str(x.find("div", "news_author").get_text()).split("dodany przez: ", 1)[1],
              time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y").isoformat(),
              cleantext=str(x.find("div", "news_content").get_text()).strip())
-    a["content"] = bleach.clean(a["content"], strip=True, tags=["p", "strong", "em", "ul", "ol", "li", "img"])
+    a["content"] = bleach.clean(a["content"], strip=True, tags=["p", "strong", "em", "ul", "ol", "li", "img"], attributes=ALLOWED_ATTRIBUTES)
     with cache.pipeline() as pipe:
         pipe.set('n:%i' % item, pickle.dumps(a))
         pipe.expire('n:%i' % item, article_ttl)
