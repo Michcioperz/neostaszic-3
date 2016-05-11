@@ -4,6 +4,7 @@ import urllib.parse
 from operator import itemgetter
 
 import bleach
+import html5lib
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask, render_template, request, url_for, Response, jsonify, abort
@@ -22,7 +23,7 @@ article_ttl = 1800
 
 def image_if_any(x: BeautifulSoup) -> str:
     try:
-        return x.find("a", "highslide").extract()["href"]
+        return urllib.parse.urljoin("http://lo01.pl/staszic/index.php",x.find("a", "highslide").extract()["href"])
     except AttributeError:
         return None
 
@@ -45,6 +46,10 @@ def _get_news(page: int = 1) -> list:
             i += 1
     for news in n:
         news["content"] = bleach.clean(news["content"], strip=True, tags=["p", "strong", "em", "ul", "ol", "li", "img"], attributes=ALLOWED_ATTRIBUTES)
+        soupy_content = BeautifulSoup(news["content"])
+        for img in soupy_content.findAll("img"):
+            img["src"] = urllib.parse.join("http://lo01.pl/staszic/index.php", img["src"])
+        news["content"] = str(soupy_content)
     with cache.pipeline() as pipe:
         pipe.set('p:%i' % page, pickle.dumps(n))
         pipe.expire('p:%i' % page, page_ttl)
@@ -73,6 +78,10 @@ def _get_article(item: int) -> dict:
              time=datetime.datetime.strptime(x.find("div", "news_time").get_text(), "%H:%M %d.%m.%Y").isoformat(),
              cleantext=str(x.find("div", "news_content").get_text()).strip())
     a["content"] = bleach.clean(a["content"], strip=True, tags=["p", "strong", "em", "ul", "ol", "li", "img"], attributes=ALLOWED_ATTRIBUTES)
+    soupy_content = BeautifulSoup(a["content"])
+    for img in soupy_content.findAll("img"):
+        img["src"] = urllib.parse.join("http://lo01.pl/staszic/index.php", img["src"])
+    a["content"] = str(soupy_content)
     with cache.pipeline() as pipe:
         pipe.set('n:%i' % item, pickle.dumps(a))
         pipe.expire('n:%i' % item, article_ttl)
