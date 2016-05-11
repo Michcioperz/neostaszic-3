@@ -48,7 +48,7 @@ def _get_news(page: int = 1) -> list:
         news["content"] = bleach.clean(news["content"], strip=True, tags=["p", "strong", "em", "ul", "ol", "li", "img"], attributes=ALLOWED_ATTRIBUTES)
         soupy_content = BeautifulSoup(news["content"])
         for img in soupy_content.findAll("img"):
-            img["src"] = urllib.parse.join("http://lo01.pl/staszic/index.php", img["src"])
+            img["src"] = urllib.parse.urljoin("http://lo01.pl/staszic/index.php", img["src"])
         news["content"] = str(soupy_content)
     with cache.pipeline() as pipe:
         pipe.set('p:%i' % page, pickle.dumps(n))
@@ -80,7 +80,7 @@ def _get_article(item: int) -> dict:
     a["content"] = bleach.clean(a["content"], strip=True, tags=["p", "strong", "em", "ul", "ol", "li", "img"], attributes=ALLOWED_ATTRIBUTES)
     soupy_content = BeautifulSoup(a["content"])
     for img in soupy_content.findAll("img"):
-        img["src"] = urllib.parse.join("http://lo01.pl/staszic/index.php", img["src"])
+        img["src"] = urllib.parse.urljoin("http://lo01.pl/staszic/index.php", img["src"])
     a["content"] = str(soupy_content)
     with cache.pipeline() as pipe:
         pipe.set('n:%i' % item, pickle.dumps(a))
