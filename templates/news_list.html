@@ -13,8 +13,8 @@
       <meta itemprop="url" content="https://staszi.cf{{ url_for("news_item", item=article.id) }}"/>
       {% if "img" in article and article.img != None %}
         <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
-          <img generator-unable-to-provide-required-alt src="http://lo01.pl/staszic/{{ article.img }}"/>
-          <meta itemprop="url" content="http://lo01.pl/staszic/{{ article.img }}"/>
+          <img generator-unable-to-provide-required-alt src="{{ article.img }}"/>
+          <meta itemprop="url" content="{{ article.img }}"/>
         </div>
       {% endif %}
       <a href="{{ url_for("news_item", item=article.id) }}"><h2 itemprop="headline">{{ article.title }}</h2></a>

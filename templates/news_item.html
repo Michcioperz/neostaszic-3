@@ -7,7 +7,7 @@
   <meta property="article:published_time" content="{{ article.time }}"/>
   <meta http-equiv="Last-Modified" content="{{ article.time }}"/>
   {% if "img" in article and article.img != None %}
-    <meta property="og:image" content="http://lo01.pl/staszic/{{ article.img }}"/>
+    <meta property="og:image" content="{{ article.img }}"/>
   {% endif %}
   <meta property="og:url" content="https://staszi.cf{{ url_for("news_item", item=article.id) }}"/>
 {% endblock head %}
@@ -18,8 +18,8 @@
     <meta itemprop="url" content="https://staszi.cf{{ url_for("news_item", item=article.id) }}"/>
     {% if "img" in article and article.img != None %}
       <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
-        <img generator-unable-to-provide-required-alt src="http://lo01.pl/staszic/{{ article.img }}"/>
-        <meta itemprop="url" content="http://lo01.pl/staszic/{{ article.img }}"/>
+        <img generator-unable-to-provide-required-alt src="{{ article.img }}"/>
+        <meta itemprop="url" content="{{ article.img }}"/>
       </div>
     {% endif %}
     <h2 itemprop="headline">{{ article.title }}</h2>
