@@ -30,12 +30,15 @@ def image_if_any(x: BeautifulSoup) -> str:
 
 def _get_news(page: int = 1) -> list:
     fetched = False
+    attempts = 0
     while not fetched:
         try:
+            attempts += 1
             r = requests.get("http://lo01.pl/staszic/index.php", params=dict(page=page))
             fetched = True
         except requests.exceptions.ConnectionError:
-            pass
+            if attempts >= 3:
+                return []
     r.encoding = "UTF-8"
     n = [dict(img=image_if_any(x), title=x.find("div", "news_title").get_text(),
               id=urllib.parse.parse_qs(urllib.parse.urlparse(x.find("div", "news_title").a["href"]).query)["id"][0],
@@ -76,12 +79,15 @@ def get_fresh_news() -> dict:
 
 def _get_article(item: int) -> dict:
     fetched = False
+    attempts = 0
     while not fetched:
         try:
+            attempts += 1
             r = requests.get("http://lo01.pl/staszic/index.php", params=dict(subpage="news", id=item))
             fetched = True
         except requests.exceptions.ConnectionError:
-            pass
+            if attempts >= 3:
+                return {"status": "error"}
     r.encoding = "UTF-8"
     x = BeautifulSoup(r.text).find("div", "news")
     a = dict(img=image_if_any(x), title=str(x.find("div", "news_title").get_text()), id=item,
