@@ -25,7 +25,10 @@ def image_if_any(x: BeautifulSoup) -> str:
     try:
         return urllib.parse.urljoin("http://lo01.pl/staszic/index.php",x.find("a", "highslide").extract()["href"])
     except AttributeError:
-        return None
+        try:
+            return urllib.parse.urljoin("http://lo01.pl/staszic/index.php",x.find("img").extract()["src"])
+        except:
+            return None
 
 
 def _get_news(page: int = 1) -> list:
